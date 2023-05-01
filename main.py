@@ -10,13 +10,13 @@ app = Flask(__name__)
 def home():
     return "GIS 5572 - Final - Maochuan Wang"
 
-@app.route("/City_Pred2022")
+@app.route("/City_Pred2022", methods=['GET'])
 def city_pred2022():
     connection = psycopg2.connect(
-        host='spatialdb.gisandbox.org',
-        database='wang8837',
-        user='wang8837',
-        password='student'
+        host='35.223.186.20',
+        database='postgres',
+        user='postgres',
+        password='139571wang'
     )
     cursor = connection.cursor()
     cursor.execute("""
