@@ -1,22 +1,48 @@
+from flask import Flask, request
+from database import Database
 import os
-from flask import Flask, jsonify
-import psycopg2
-from psycopg2.extras import RealDictCursor
 
+# Set up DB Connection
+db = Database.initialize_from_env()
+
+# Set Vars for Formatting
+start_str = """{"type": "FeatureCollection", "features": """
+end_str = "}"
+
+# Set Up Flask App
 app = Flask(__name__)
 
-@app.route('/City_Pred2022')
-def City_pred2022():
-    with psycopg2.connect(host='spatialdb.gisandbox.org', database='wang8837', user='wang8837') as connection:
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute("SELECT json_build_object('type', 'FeatureCollection', 'features', json_agg(features.feature)::jsonb)"
-                           "FROM (SELECT jsonb_build_object('type', 'Feature', 'geometry', ST_AsGeoJSON(geom)::jsonb, 'properties', jsonb_build_object('gid', gid, 'city_name', city_name, 'population', population, 'pred_mc', pred_mc, 'pred_g', pred_g, 'pred_h', pred_h))::jsonb As feature FROM city_pred2022) features;")
-            result = cursor.fetchone()
-            return jsonify(result)
+# Define Routes
+@app.route("/")
+def home():
+    return "GIS 5572 - Final - Maochuan Wang"
+
+
+@app.route("/City_Pred2022")
+def city_pred2022():
+    # Make Connection
+    db.connect()
+
+    # Query
+    q = "SELECT JSON_AGG(ST_AsGeoJSON(geom), 'properties', jsonb_build_object(
+            'city_name', city_name,
+            'population', population,
+            'pred_mc', pred_mc,
+            'pred_g', pred_g,
+            'pred_h', pred_h)) FROM city_pred2022;"
+
+    # Formatting
+    q_out = str(db.query(q)[0][0]).replace("'", "")
+
+    # Close Connection
+    db.close()
+
+    # Return GeoJSON Result
+    return start_str + q_out + end_str
+
+
+
+
 
 if __name__ == "__main__":
-    app.run(
-        debug=True,
-        host='0.0.0.0',
-        port=int(os.environ.get("PORT", 8080))
-    )
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
