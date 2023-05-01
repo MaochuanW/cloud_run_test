@@ -1,6 +1,7 @@
 from flask import Flask, request
 import os
 import psycopg2
+import string
 
 # Set Up Flask App
 app = Flask(__name__)
@@ -10,7 +11,7 @@ app = Flask(__name__)
 def home():
     return "GIS 5572 - Final - Maochuan Wang"
 
-@app.route("/City_Pred2022", methods=['GET'])
+@app.route("/City_Pred2022")
 def city_pred2022():
     connection = psycopg2.connect(
         host='35.223.186.20',
