@@ -10,7 +10,7 @@ def City_pred2022():
     with psycopg2.connect(host='spatialdb.gisandbox.org', database='wang8837', user='wang8837') as connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("SELECT json_build_object('type', 'FeatureCollection', 'features', json_agg(features.feature)::jsonb)"
-                           "FROM (SELECT jsonb_build_object('type', 'Feature', 'geometry', ST_AsGeoJSON(shape)::jsonb, 'properties', jsonb_build_object('gid', gid, 'city_name', city_name, 'population', population, 'pred_mc', pred_mc, 'pred_g', pred_g, 'pred_h', pred_h))::jsonb As feature FROM city_pred2022) features;")
+                           "FROM (SELECT jsonb_build_object('type', 'Feature', 'geometry', ST_AsGeoJSON(geom)::jsonb, 'properties', jsonb_build_object('gid', gid, 'city_name', city_name, 'population', population, 'pred_mc', pred_mc, 'pred_g', pred_g, 'pred_h', pred_h))::jsonb As feature FROM city_pred2022) features;")
             result = cursor.fetchone()
             return jsonify(result)
 
