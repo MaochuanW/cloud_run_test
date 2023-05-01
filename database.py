@@ -28,10 +28,10 @@ class Database:
             db_name (str): Name of the database that you would like to access.
             port (int): Port number of database.
         """
-        self.host = 'spatialdb.gisandbox.org'
-        self.user = 'wang8837'
-        self.password = 'student'
-        self.db_name = 'wang8837
+        self.host = spatialdb.gisandbox.org
+        self.user = wang8837
+        self.password = student
+        self.db_name = wang8837
         self.port = 5432
 
         # Set Connection to None
