@@ -21,20 +21,36 @@ def city_pred2022():
     )
     cursor = connection.cursor()
     cursor.execute("""
-        SELECT JSON_AGG(
-            json_build_object(
-                'type', 'Feature',
-                'geometry', ST_AsGeoJSON(geom),
-                'properties', jsonb_build_object(
-                    'city_name', city_name,
-                    'population', population,
-                    'pred_mc', pred_mc,
-                    'pred_g', pred_g,
-                    'pred_h', pred_h
-                )
-            )
-        )
-        FROM city_pred2022;
+        WITH data AS (
+  SELECT
+    city_name,
+    population,
+    pred_mc,
+    pred_g,
+    pred_h,
+    ST_AsGeoJSON(geom)::json AS geometry
+  FROM
+    city_pred2022
+)
+
+SELECT json_build_object(
+  'type', 'FeatureCollection',
+  'features', json_agg(
+    json_build_object(
+      'type', 'Feature',
+      'geometry', geometry,
+      'properties', json_build_object(
+        'city_name', city_name,
+        'population', population,
+        'pred_mc', pred_mc,
+        'pred_g', pred_g,
+        'pred_h', pred_h
+      )
+    )
+  )
+) AS geojson
+FROM data;
+
     """)
 
     results = cursor.fetchall()
