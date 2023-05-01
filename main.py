@@ -24,12 +24,21 @@ def city_pred2022():
     db.connect()
 
     # Query
-    q = "SELECT JSON_AGG(ST_AsGeoJSON(geom), 'properties', jsonb_build_object(
+    q = "SELECT JSON_AGG(
+    json_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJSON(geom),
+        'properties', jsonb_build_object(
             'city_name', city_name,
             'population', population,
             'pred_mc', pred_mc,
             'pred_g', pred_g,
-            'pred_h', pred_h)) FROM city_pred2022;"
+            'pred_h', pred_h
+        )
+    )
+)
+FROM city_pred2022;"
+
 
     # Formatting
     q_out = str(db.query(q)[0][0]).replace("'", "")
