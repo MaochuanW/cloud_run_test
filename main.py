@@ -1,59 +1,24 @@
 import os
-import sqlalchemy
-import numpy as np
-from flask import Flask
-from datetime import datetime
-import json
+import string
+from flask import Flask, request
+import psycopg2
+app = Flask(__name__) 
 
-app = Flask(__name__)
-
-
-@app.route("/")
-def hello_world():
-    matrix = np.random.rand(3,2)
-    return str(matrix)
-
-
-@app.route("/hello")
-def hello():
-    return "hello"
+@app.route('/City_Pred2022') #python decorator 
+def City_pred2022(): #function that app.route decorator references
+    connection = psycopg2.connect(host='spatialdb.gisandbox.org', database='wang8837', user='wang8837')
+    cursor = connection.cursor()
+    cursor.execute("SELECT json_build_object('type', 'FeatureCollection', 'features', json_agg(features.feature)::jsonb)"
+            "FROM (SELECT jsonb_build_object('type', 'Feature', 'geometry', ST_AsGeoJSON(shape)::jsonb, 'properties', jsonb_build_object('gid', gid, 'city_name', city_name, 'Population', Population, 'sim_mc', sim_mc, 'sim_g', sim_g, 'sim_h', sim_h))::jsonb As feature FROM city_sim) features;")
+    returns =cursor.fetchall()
+    connection.close()
+    return returns[0][0]
 
 
-@app.route("/5572/milk_truck_sensor")
-def milk_truck_sensor():
-    '''
-    Returns lat, lon, current time, and temperature sensor.
-    All are randomly nulled 5% of the API calls.
-    '''
-    
-    lat = np.random.normal(46.7296, 6, 1)[0]
-    lon = np.random.normal(-94, 10, 1)[0]
-    
-    now = datetime.now()
-    current_time = now.strftime("%D:%H:%M:%S")
-    
-    air_temperature = np.random.normal(31, 15, 1)[0]
-    
-    if np.random.uniform(0.0,1.0,1)[0] < 0.05:
-        air_temperature = 'nan'
-
-    if np.random.uniform(0.0,1.0,1)[0] < 0.05:
-        lat = 'nan'
-        
-    if np.random.uniform(0.0,1.0,1)[0] < 0.05:
-        lon = 'nan'
-    
-    if np.random.uniform(0.0,1.0,1)[0] < 0.05:
-        current_time = '01/21/29:15:11:12'
-    
-    response_dict = {
-        'lat':lat,
-        'lon':lon,
-        'current_time':current_time,
-        'air_temperature':air_temperature}
-    
-    return json.dumps(response_dict)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(
+      debug=True, #shows errors 
+      host='0.0.0.0', #tells app to run exposed to outside world
+      port=int(os.environ.get("PORT", 8080))) #port = '5000'
