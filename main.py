@@ -14,10 +14,10 @@ def home():
 @app.route("/City_Pred2022")
 def city_pred2022():
     connection = psycopg2.connect(
-        host='35.223.186.20',
-        database='postgres',
-        user='postgres',
-        password='139571wang'
+        host='spatialdb.gisandbox.org',
+        database='wang8837',
+        user='wang8837',
+        password='student'
     )
     cursor = connection.cursor()
     cursor.execute("""
