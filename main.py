@@ -9,7 +9,7 @@ def City_pred2022(): #function that app.route decorator references
     connection = psycopg2.connect(host='spatialdb.gisandbox.org', database='wang8837', user='wang8837')
     cursor = connection.cursor()
     cursor.execute("SELECT json_build_object('type', 'FeatureCollection', 'features', json_agg(features.feature)::jsonb)"
-            "FROM (SELECT jsonb_build_object('type', 'Feature', 'geometry', ST_AsGeoJSON(shape)::jsonb, 'properties', jsonb_build_object('gid', gid, 'city_name', city_name, 'Population', Population, 'sim_mc', sim_mc, 'sim_g', sim_g, 'sim_h', sim_h))::jsonb As feature FROM city_sim) features;")
+            "FROM (SELECT jsonb_build_object('type', 'Feature', 'geometry', ST_AsGeoJSON(shape)::jsonb, 'properties', jsonb_build_object('gid', gid, 'city_name', city_name, 'population', population, 'pred_mc', pred_mc, 'pred_g', pred_g, 'pred_h', pred_h))::jsonb As feature FROM city_pred2022) features;")
     returns =cursor.fetchall()
     connection.close()
     return returns[0][0]
