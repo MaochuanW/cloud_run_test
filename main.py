@@ -1,13 +1,6 @@
 from flask import Flask, request
-from database import Database
 import os
-
-# Set up DB Connection
-db = Database.initialize_from_env()
-
-# Set Vars for Formatting
-start_str = """{"type": "FeatureCollection", "features": """
-end_str = "}"
+import psycopg2
 
 # Set Up Flask App
 app = Flask(__name__)
@@ -17,41 +10,35 @@ app = Flask(__name__)
 def home():
     return "GIS 5572 - Final - Maochuan Wang"
 
-
 @app.route("/City_Pred2022")
 def city_pred2022():
-    # Make Connection
-    db.connect()
-
-    # Query
-    q = "SELECT JSON_AGG(
-    json_build_object(
-        'type', 'Feature',
-        'geometry', ST_AsGeoJSON(geom),
-        'properties', jsonb_build_object(
-            'city_name', city_name,
-            'population', population,
-            'pred_mc', pred_mc,
-            'pred_g', pred_g,
-            'pred_h', pred_h
-        )
+    connection = psycopg2.connect(
+        host='spatialdb.gisandbox.org',
+        database='wang8837',
+        user='wang8837',
+        password='student'
     )
-)
-FROM city_pred2022;"
+    cursor = connection.cursor()
+    cursor.execute("""
+        SELECT JSON_AGG(
+            json_build_object(
+                'type', 'Feature',
+                'geometry', ST_AsGeoJSON(geom),
+                'properties', jsonb_build_object(
+                    'city_name', city_name,
+                    'population', population,
+                    'pred_mc', pred_mc,
+                    'pred_g', pred_g,
+                    'pred_h', pred_h
+                )
+            )
+        )
+        FROM city_pred2022;
+    """)
 
-
-    # Formatting
-    q_out = str(db.query(q)[0][0]).replace("'", "")
-
-    # Close Connection
-    db.close()
-
-    # Return GeoJSON Result
-    return start_str + q_out + end_str
-
-
-
-
+    results = cursor.fetchall()
+    connection.close()
+    return results[0][0]
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
