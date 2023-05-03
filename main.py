@@ -11,8 +11,8 @@ app = Flask(__name__)
 def home():
     return "GIS 5572 - Final - Maochuan Wang"
 
-@app.route("/City_Pred2022")
-def city_pred2022():
+@app.route("/City_Pred_2021June")
+def city_pred_2021June():
     connection = psycopg2.connect(
         host='spatialdb.gisandbox.org',
         database='wang8837',
@@ -30,7 +30,7 @@ def city_pred2022():
     pred_h,
     ST_AsGeoJSON(geom)::json AS geometry
   FROM
-    city_pred2022
+    city_pred_0
 )
 
 SELECT json_build_object(
@@ -57,8 +57,8 @@ FROM data;
     connection.close()
     return results[0][0]
 
-@app.route("/City_Pred2023")
-def city_pred2023():
+@app.route("/City_Pred_2021July")
+def city_pred_2023July():
     connection = psycopg2.connect(
         host='spatialdb.gisandbox.org',
         database='wang8837',
@@ -76,7 +76,7 @@ def city_pred2023():
     pred_h,
     ST_AsGeoJSON(geom)::json AS geometry
   FROM
-    city_pred2023
+    city_pred_1
 )
 
 SELECT json_build_object(
@@ -103,8 +103,8 @@ FROM data;
     connection.close()
     return results[0][0]
 
-@app.route("/City_Pred2024")
-def city_pred2024():
+@app.route("/City_Pred_2021August")
+def city_pred_August():
     connection = psycopg2.connect(
         host='spatialdb.gisandbox.org',
         database='wang8837',
@@ -122,7 +122,7 @@ def city_pred2024():
     pred_h,
     ST_AsGeoJSON(geom)::json AS geometry
   FROM
-    city_pred2024
+    city_pred_2
 )
 
 SELECT json_build_object(
@@ -149,8 +149,8 @@ FROM data;
     connection.close()
     return results[0][0]
 
-@app.route("/City_Sim")
-def city_sim():
+@app.route("/City_Pred_2021September")
+def city_Pred_2023sep():
     connection = psycopg2.connect(
         host='spatialdb.gisandbox.org',
         database='wang8837',
@@ -163,12 +163,12 @@ def city_sim():
   SELECT
     city_name,
     population,
-    sim_mc,
-    sim_g,
-    sim_h,
+    pred_mc,
+    pred_g,
+    pred_h,
     ST_AsGeoJSON(geom)::json AS geometry
   FROM
-    city_sim
+    city_pred_3
 )
 
 SELECT json_build_object(
@@ -180,9 +180,9 @@ SELECT json_build_object(
       'properties', json_build_object(
         'city_name', city_name,
         'population', population,
-        'sim_mc', sim_mc,
-        'sim_g', sim_g,
-        'sim_h', sim_h
+        'pred_mc', pred_mc,
+        'pred_g', pred_g,
+        'pred_h', pred_h
       )
     )
   )
@@ -195,7 +195,7 @@ FROM data;
     connection.close()
     return results[0][0]
 
-@app.route("/final_stinkbug")
+@app.route("/Stinkbug_Priority")
 def final_stinkbug():
     connection = psycopg2.connect(
         host='spatialdb.gisandbox.org',
@@ -212,7 +212,7 @@ def final_stinkbug():
     priority,
     ST_AsGeoJSON(geom)::json AS geometry
   FROM
-    final_stinkbug
+    stinkbug_priority
 )
 
 SELECT json_build_object(
